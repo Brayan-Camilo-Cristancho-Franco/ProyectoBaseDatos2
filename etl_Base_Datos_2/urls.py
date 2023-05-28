@@ -20,5 +20,5 @@ from app.views import Index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', Index.as_view(), name='index'),
+    path('process-csv/', Index.as_view(), name='index')
 ]
