@@ -1,24 +1,35 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
 import csv
+from .forms import FormCSV
+from .utils import guardar_csv
 # Create your views here.
 
-class Index(TemplateView):
+class Index(FormView):
     template_name = 'index.html'
-    def get(self, request):
-        # Ruta del archivo CSV
-        csv_file = "/ruta/al/archivo.csv"
+    form_class = FormCSV
+    success_url = 'index'
+    
+    def form_valid(self, form):
+        archivo_csv = form.cleaned_data['archivo_csv']
+        ruta_archivo = guardar_csv(archivo_csv)
+        # Realiza otras acciones necesarias después de guardar el archivo
+        return super().form_valid(form)
+    
+    # def get(self, request):
+    #     # Ruta del archivo CSV
+    #     csv_file = "/ruta/al/archivo.csv"
 
-        # Diccionario para almacenar los datos
-        data_dict = {}
+    #     # Diccionario para almacenar los datos
+    #     data_dict = {}
 
-        # Leer el archivo CSV y convertirlo en un diccionario
-        with open(csv_file, "r") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                data_dict[row['clave']] = row['valor']
+    #     # Leer el archivo CSV y convertirlo en un diccionario
+    #     with open(csv_file, "r") as file:
+    #         reader = csv.DictReader(file)
+    #         for row in reader:
+    #             data_dict[row['clave']] = row['valor']
 
-        # Devolver el diccionario como una respuesta HTTP
+    #     # Devolver el diccionario como una respuesta HTTP
         
         
         """
