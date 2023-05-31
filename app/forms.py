@@ -1,7 +1,10 @@
 from django import forms
 
 class FormCSV(forms.Form):
-    archivo_csv = forms.FileField(label='Archivo CSV')
+    archivo_csv = forms.FileField(
+        label = "",
+        widget = forms.FileInput(attrs={'class': 'form-control', 'type': 'file', 'id':"formFile"})
+        )
 
     def clean_archivo_csv(self):
         archivo = self.cleaned_data.get('archivo_csv')

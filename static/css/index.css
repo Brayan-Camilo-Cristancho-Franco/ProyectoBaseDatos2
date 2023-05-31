@@ -4,7 +4,38 @@ body {
 }
 
 header {
+  display: flex;
   width: 100%;
-  height: 50px;
   background-color: #276E90;
+  color: #ffffff;
+  align-items: center;
+  padding: 10px 0;
+  text-align: center;
+}
+
+header .container-img-logo img {
+  width: 200px;
+}
+
+header .container-text-title {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-right: 200px;
+}
+
+header h2 {
+  margin: 0;
+}
+
+
+main {
+  padding: 30px;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+main .container_form {
+  width: 50%;
 }
