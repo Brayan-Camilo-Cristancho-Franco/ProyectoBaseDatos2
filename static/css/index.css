@@ -1,4 +1,4 @@
-body {
+html body {
   margin: 0;
   padding: 0;
 }
@@ -9,8 +9,16 @@ header {
   background-color: #276E90;
   color: #ffffff;
   align-items: center;
-  padding: 10px 0;
   text-align: center;
+}
+
+.bg-276E90 {
+  background-color: #04374f;
+}
+
+header nav {
+  width: 100%;
+  background-color: #276E90;
 }
 
 header .container-img-logo img {
@@ -20,8 +28,12 @@ header .container-img-logo img {
 header .container-text-title {
   display: flex;
   justify-content: center;
-  width: 100%;
+  /* width: 100%; */
   margin-right: 200px;
+}
+
+.navbar-toggler-icon {
+  color: white;
 }
 
 header h2 {
@@ -34,8 +46,64 @@ main {
   display: flex;
   width: 100%;
   justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 main .container_form {
   width: 50%;
 }
+
+.container_table .card {
+  border-radius: 2px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  margin-bottom: 20px;
+}
+
+.table-custom {
+  background: white;
+}
+
+.card .header {
+  line-height: 64px;
+  padding-left: 24px;
+  padding-right: 14px;
+  background-color: #05354b;
+  color: #ffffff;
+}
+
+.card .header h4 {
+  font-size: 20px;
+}
+
+.table-custom {
+  padding: 0;
+  margin: 0;
+}
+
+.table-custom>thead>tr>th {
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.54)
+}
+
+.table-custom>tbody>tr>td {
+  line-height: 20px;
+  word-wrap: break-word;
+  font-size: 12px;
+}
+
+/* .container_table .col-12 {
+  margin-bottom: 20px;
+}
+
+.container_table h4 {
+  font-size: 16px;
+}
+
+.container_table th {
+  font-size: 14px;
+} */
+
+/* .container_table td {
+  font-size: 12px;
+} */

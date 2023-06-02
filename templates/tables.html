@@ -1,0 +1,245 @@
+{% extends 'index.html' %}{% load static %} {% block content %}
+<div class="container_table">
+  <div class="row col-12">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header"><h4>Empresa</h4></div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nit</th>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Sector</th>
+              <th>Correo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for empresa in empresas %}
+            <tr>
+              <td>{{ empresa.ID }}</td>
+              <td>{{ empresa.Nit }}</td>
+              <td>{{ empresa.Nombre }}</td>
+              <td>{{ empresa.Direccion }}</td>
+              <td>{{ empresa.Sector }}</td>
+              <td>{{ empresa.Correo }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header"><h4>Proyectos</h4></div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Fecha de Inicio</th>
+              <th>Fecha de Finalización</th>
+              <th>Id Empresa</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for proyecto in proyectos %}
+            <tr>
+              <td>{{ proyecto.ID }}</td>
+              <td>{{ proyecto.Nombre }}</td>
+              <td>{{ proyecto.Descripcion }}</td>
+              <td>{{ proyecto.Fecha_Inicio }}</td>
+              <td>{{ proyecto.Fecha_Finalizacion }}</td>
+              <td>{{ proyecto.Id_Empresa }}</td>
+              <td>{{ proyecto.Estado }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header"><h4>Métodos de Pago</h4></div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for metodo in metodos_pago %}
+            <tr>
+              <td>{{ metodo.ID }}</td>
+              <td>{{ metodo.Nombre }}</td>
+              <td>{{ metodo.Descripcion }}</td>
+              <td>{{ metodo.Estado }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header"><h4>Facturas</h4></div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Fecha de Factura</th>
+              <th>Valor</th>
+              <th>Id Método de Pago</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for factura in facturas %}
+            <tr>
+              <td>{{ factura.ID }}</td>
+              <td>{{ factura.Fecha_Factura }}</td>
+              <td>{{ factura.Valor }}</td>
+              <td>{{ factura.Id_M_Pago }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header"><h4>Tipos de Servicio</h4></div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tipo in tipos_servicio %}
+            <tr>
+              <td>{{ tipo.ID }}</td>
+              <td>{{ tipo.Nombre }}</td>
+              <td>{{ tipo.Descripcion }}</td>
+              <td>{{ tipo.Estado }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header"><h4>Consultorías</h4></div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Id Factura</th>
+              <th>Id Tipo de Servicio</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for consultoria in consultorias %}
+            <tr>
+              <td>{{ consultoria.ID }}</td>
+              <td>{{ consultoria.Id_Factura }}</td>
+              <td>{{ consultoria.Id_T_Servicio }}</td>
+              <td>{{ consultoria.Estado }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header">
+          <h4>Relación Consultoría-Empresa</h4>
+        </div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Id Consultoría</th>
+              <th>Id Empresa</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cons_emp in cons_emps %}
+            <tr>
+              <td>{{ cons_emp.ID }}</td>
+              <td>{{ cons_emp.id_Consultoria }}</td>
+              <td>{{ cons_emp.id_Empresa }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header"><h4>Consultores</h4></div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Correo</th>
+              <th>Área de Especialización</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for consultor in consultores %}
+            <tr>
+              <td>{{ consultor.ID }}</td>
+              <td>{{ consultor.Nombre }}</td>
+              <td>{{ consultor.Telefono }}</td>
+              <td>{{ consultor.Correo }}</td>
+              <td>{{ consultor.Area_Especializacion }}</td>
+              <td>{{ consultor.ESTADO }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header">
+          <h4>Relación Consultoría-Consultor</h4>
+        </div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Id Consultoría</th>
+              <th>Id Consultor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cons_cons in cons_conses %}
+            <tr>
+              <td>{{ cons_cons.ID }}</td>
+              <td>{{ cons_cons.Id_Consultoria }}</td>
+              <td>{{ cons_cons.Id_Consultor }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

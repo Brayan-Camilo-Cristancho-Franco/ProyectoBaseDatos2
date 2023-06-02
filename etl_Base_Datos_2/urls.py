@@ -16,11 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import ConvertirCSVView, CSVImporterView
+from app.views import CSVImporterView, TableView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('process-csv/', Index.as_view(), name='index'),
-    path('convertir-csv/', ConvertirCSVView.as_view(), name='convertir_csv'),
-    path('import-csv/', CSVImporterView.as_view(), name='csv_import')
+    path('', CSVImporterView.as_view(), name='index'),
+    path('table', TableView.as_view(), name='table')
 ]

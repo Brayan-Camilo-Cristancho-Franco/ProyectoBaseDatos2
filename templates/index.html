@@ -5,20 +5,18 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Bases de Datos{% endblock title %}</title>
+    <title>{% block title %}Bases de Datos 2{% endblock title %}</title>
     <link rel="icon" href="{% static 'img/LogoUEB.png' %}" type="image/png" />
     {% block js %}
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% endblock js %} {% block css %}
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-      crossorigin="anonymous"
+    />
+    <link
+      href="https://getbootstrap.com/docs/5.3/assets/css/docs.css"
+      rel="stylesheet"
     />
     <link href="{% static 'css/index.css' %}" rel="stylesheet" />
     {% endblock css %}
@@ -26,14 +24,77 @@
   <body>
     {% block body %}
     <header>
+      {% comment %}
       <div class="container-img-logo">
         <img src="{% static 'img/logo_blanco.png' %}" />
       </div>
       <div class="container-text-title">
         <h2>Universidad El Bosque - Bases de Datos 2</h2>
       </div>
+      {% endcomment %}
+      <nav class="navbar">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <div class="container-img-logo">
+              <img src="{% static 'img/logo_blanco.png' %}" /></div
+          ></a>
+          <div class="container-text-title">
+            <h2>Universidad El Bosque - Bases de Datos 2</h2>
+          </div>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasDarkNavbar"
+            aria-controls="offcanvasDarkNavbar"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon text-white"></span>
+          </button>
+          <div
+            class="offcanvas offcanvas-end bg-276E90"
+            tabindex="-1"
+            id="offcanvasDarkNavbar"
+            aria-labelledby="offcanvasDarkNavbarLabel"
+          >
+            <div class="offcanvas-header">
+              <h5
+                class="offcanvas-title text-white"
+                id="offcanvasDarkNavbarLabel"
+              >
+                Menu
+              </h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                  <a
+                    class="nav-link active text-white"
+                    aria-current="page"
+                    href="{% url 'index' %}"
+                    >Inicio</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="{% url 'table' %}"
+                    >Tabla</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
     </header>
     <main>
+      {% block content %}
+
       <div class="container_form">
         <div class="card">
           <div class="card-header">
@@ -50,14 +111,8 @@
             </form>
           </div>
         </div>
-        <!-- cargar_csv.html -->
       </div>
-      <div class="container_table">
-        <table>
-          <thead></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+      {% endblock content %}
     </main>
     <footer></footer>
     {% endblock body %}{% block extrajs %}{% endblock extrajs %}

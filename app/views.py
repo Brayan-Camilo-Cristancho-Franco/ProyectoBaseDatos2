@@ -1,161 +1,111 @@
-from django.shortcuts import render ,HttpResponse
-from django.views.generic import TemplateView, FormView, View
-import csv
-from .forms import FormCSV
-from .utils import guardar_csv, cargar_csv
-from .models import TablaInicial
-# 
-import os
-from django.conf import settings
-import json
-from django.http import JsonResponse
 import pandas as pd
 from django.db import connection
+from django.views.generic.edit import FormView
+from django.views.generic import ListView, TemplateView
+from .models import *
+from .forms import FormCSV
 
-
-# Create your views here.
-
-# class Index(FormView):
-#     template_name = 'index.html'
-#     form_class = FormCSV
-#     success_url = '/process-csv'
-    
-#     def form_valid(self, form):
-#         archivo_csv = form.cleaned_data['archivo_csv']
-#         ruta_archivo = guardar_csv(archivo_csv)
-#         # Realiza otras acciones necesarias después de guardar el archivo
-#         return super().form_valid(form)
-
-#     def mostrar_csv():
-#         data = cargar_csv()
-#         print(data)
-    
-#     def importar_datos(self):
-#         with open(self.archivo, 'r') as csv_file:
-#             reader = csv.reader(csv_file)
-#             for row in reader:
-#                 # Inserta los datos en tu modelo temporal
-#                 tabla_inicial = TablaInicial(CODIGO_FACTURA=row[0], PRECIO=row[1], NOMBRE=row[2])
-#                 tabla_inicial.save()
-
-    
-class ConvertirCSVView(View):
-    def get(self, request):
-        response = cargar_csv()
-        
-        return JsonResponse(response, safe=False)
-    
 class CSVImporterView(FormView):
-    template_name = 'index.html'
-    form_class = FormCSV
-    success_url = '/import-csv'
+    template_name = 'index.html'  # Nombre de la plantilla que se utilizará para renderizar la vista
+    form_class = FormCSV  # Clase del formulario que se utilizará para procesar los datos de entrada
+    success_url = '/table'  # URL de redirección después de que el formulario se haya procesado correctamente
 
     def form_valid(self, form):
-        archivo_csv = form.cleaned_data['archivo_csv']
+        archivo_csv = form.cleaned_data['archivo_csv']  # Obtener el archivo CSV enviado en el formulario
+        
+        tipos_de_datos_mysql = {
+            'ID_Empresa': 'INT',
+            'Nit_Empresa': 'VARCHAR(20)',
+            'Nombre_Empresa': 'VARCHAR(50)',
+            'Direccion_Empresa': 'VARCHAR(100)',
+            'Sector_Empresa': 'VARCHAR(50)',
+            'Correo_Empresa': 'VARCHAR(50)',
+            'ID_Proyecto': 'INT',
+            'Nombre_Proyecto': 'VARCHAR(50)',
+            'Descripcion_Proyecto': 'VARCHAR(200)',
+            'Fecha_Inicio_Proyecto': 'DATE',
+            'Fecha_Finalizacion_Proyecto': 'DATE',
+            'Id_Empresa_Proyecto': 'INT',
+            'Estado_Proyecto': 'BOOL',
+            'ID_M_Pago': 'INT',
+            'Nombre_M_Pago': 'VARCHAR(50)',
+            'Descripcion_M_Pago': 'VARCHAR(100)',
+            'Estado_M_Pago': 'BOOL',
+            'ID_Factura': 'INT',
+            'Fecha_Factura': 'DATE',
+            'Valor_Factura': 'FLOAT',
+            'Id_M_Pago_Factura': 'INT',
+            'ID_T_Servicio': 'INT',
+            'Nombre_T_Servicio': 'VARCHAR(50)',
+            'Descripcion_T_Servicio': 'VARCHAR(100)',
+            'Estado_T_Servicio': 'BOOL',
+            'ID_Consultoria': 'INT',
+            'Id_Factura_Consultoria': 'INT',
+            'Id_T_Servicio_Consultoria': 'INT',
+            'Estado_Consultoria': 'BOOL',
+            'ID_CONS_EMP': 'INT',
+            'id_Consultoria_CONS_EMP': 'INT',
+            'id_Empresa_CONS_EMP': 'INT',
+            'ID_Consultor': 'INT',
+            'Nombre_Consultor': 'VARCHAR(100)',
+            'Telefono_Consultor': 'VARCHAR(10)',
+            'Correo_Consultor': 'VARCHAR(50)',
+            'Area_Especializacion_Consultor': 'VARCHAR(50)',
+            'ESTADO_Consultor': 'BOOL',
+            'ID_CONS_CONS': 'INT',
+            'Id_Consultoria_CONS_CONS': 'INT',
+            'Id_Consultor_CONS_CONS': 'INT'
+        }
 
-        # Leer el archivo CSV con pandas
+        # Leer el archivo CSV con pandas y almacenar los datos en un DataFrame
         df = pd.read_csv(archivo_csv)
-        print(df)
-        # Insertar los datos en la tabla temporal utilizando el cursor de Django
+
+        # Nombre de la tabla temporal en la base de datos
+        nombre_tabla_temporal = "TablaTemporalPrueba2"
+
+        # Crear la tabla temporal si no existe utilizando un cursor de la conexión a la base de datos
         with connection.cursor() as cursor:
-            # Nombre de la tabla temporal en tu base de datos
-            nombre_tabla_temporal = "TablaTemporalPrueba2"
+            create_table_query = f"CREATE TEMPORARY TABLE IF NOT EXISTS {nombre_tabla_temporal} ("
+            create_table_query += ", ".join([f"{column} {tipos_de_datos_mysql[column]}" for column in df.columns])
+            create_table_query += ")"
+            cursor.execute(create_table_query)
 
-            # Crear la tabla temporal si no existe
-            cursor.execute(f"CREATE TEMPORARY TABLE IF NOT EXISTS {nombre_tabla_temporal} (CODIGO_FACTURA INT, PRECIO INT, NOMBRE VARCHAR(255))")
-
-            # Insertar los datos en la tabla temporal
+            # Insertar los datos del DataFrame en la tabla temporal
             for index, row in df.iterrows():
-                cursor.execute(f"INSERT INTO {nombre_tabla_temporal} (CODIGO_FACTURA, PRECIO, NOMBRE) VALUES (%s, %s, %s)",
-                               [row['CODIGO_FACTURA'], row['PRECIO'], row['NOMBRE']])
-            
+                insert_query = f"INSERT INTO {nombre_tabla_temporal} ("
+                insert_query += ", ".join(row.index)
+                insert_query += ") VALUES ("
+                insert_query += ", ".join([f"%s"] * len(row))
+                insert_query += ")"
+                cursor.execute(insert_query, tuple(row))
+
+            # Llamar al procedimiento almacenado "AgregarDatosDesdeTemporal" en la base de datos
             cursor.callproc('AgregarDatosDesdeTemporal')
-            # Insertar los datos de la tabla temporal en la tabla Prueba
-            # cursor.execute("""
-            #     INSERT INTO Prueba (CODIGO_FACTURA, PRECIO, NOMBRE)
-            #     SELECT CODIGO_FACTURA, PRECIO, NOMBRE
-            #     FROM TablaTemporalPrueba2
-            # """)
-            #COMPRUEBA SI SE CREO LA TABLA TEMPORAL    
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM TablaTemporalPrueba2")
-                rows = cursor.fetchall()
 
-                for row in rows:
-                    print(row)
-        return super().form_valid(form)
+            # Comprobar si se creó la tabla temporal y mostrar los registros
+            cursor.execute(f"SELECT * FROM {nombre_tabla_temporal}")
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+
+        return super().form_valid(form)  # Llamar al método form_valid() de la clase padre para finalizar el procesamiento del formulario
 
 
-
-""""
-
-def importar_csv(request):
-    if request.method == 'POST' and request.FILES['archivo_csv']:
-        archivo_csv = request.FILES['archivo_csv']
-
-        # Lee el archivo CSV y realiza la inserción en la tabla temporal
-        reader = csv.reader(archivo_csv)
-        for row in reader:
-            # Inserta los datos en tu modelo temporal
-            tu_modelo_temporal = TuModeloTemporal(campo1=row[0], campo2=row[1], ...)
-            tu_modelo_temporal.save()
-
-        return HttpResponse('CSV importado exitosamente')
-    else:
-        return render(request, 'importar_csv.html')
-        
-        
-def importar_csv(request):
-    if request.method == 'POST' and request.FILES['archivo_csv']:
-        archivo_csv = request.FILES['archivo_csv']
-
-        # Lee el archivo CSV utilizando pandas
-        df = pd.read_csv(archivo_csv)
-
-        # Itera sobre cada fila del DataFrame y realiza la inserción en la tabla temporal
-        for _, row in df.iterrows():
-            tu_modelo_temporal = TuModeloTemporal(campo1=row['campo1'], campo2=row['campo2'], ...)
-            tu_modelo_temporal.save()
-
-        return HttpResponse('CSV importado exitosamente')
-    else:
-        return render(request, 'importar_csv.html')        
-        
-        
-def importar_csv(request):
-    if request.method == 'POST' and request.FILES['archivo_csv']:
-        archivo_csv = request.FILES['archivo_csv']
-
-        # Crea una instancia del ImportadorCSV y realiza la importación
-        importador = ImportadorCSV(archivo_csv)
-        importador.importar_datos()
-
-        return HttpResponse('CSV importado exitosamente')
-    else:
-        return render(request, 'importar_csv.html')
-        
-        ------------------------------------------
-        import pandas as pd
-from django.db import connection
-
-class CSVImporter:
-    def __init__(self, csv_file):
-        self.csv_file = csv_file
-
-    def import_data(self):
-        # Leer el archivo CSV con pandas
-        df = pd.read_csv(self.csv_file)
-
-        # Insertar los datos en la tabla temporal utilizando el cursor de Django
-        with connection.cursor() as cursor:
-            # Nombre de la tabla temporal en tu base de datos
-            nombre_tabla_temporal = "TablaTemporal"
-
-            # Crear la tabla temporal si no existe
-            cursor.execute(f"CREATE TEMPORARY TABLE IF NOT EXISTS {nombre_tabla_temporal} (campo1 VARCHAR(255), campo2 INT)")
-
-            # Insertar los datos en la tabla temporal
-            for index, row in df.iterrows():
-                cursor.execute(f"INSERT INTO {nombre_tabla_temporal} (campo1, campo2) VALUES (%s, %s)", [row['campo1'], row['campo2']])
-
-"""""
+class TableView(TemplateView):
+    template_name = 'tables.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['empresas'] = Empresa.objects.all()
+        print("Prueba 1")
+        print(context['empresas'])
+        context['proyectos'] = Proyecto.objects.all()
+        context['metodos_pago'] = MetodoPago.objects.all()
+        context['facturas'] = Factura.objects.all()
+        context['tipos_servicio'] = TipoServicio.objects.all()
+        context['consultorias'] = Consultoria.objects.all()
+        context['cons_emps'] = ConsEmp.objects.all()
+        context['consultores'] = Consultor.objects.all()
+        context['cons_conses'] = ConsCons.objects.all()
+        print("Prueba 2")
+        return context
+    
