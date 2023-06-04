@@ -1,5 +1,9 @@
 {% extends 'index.html' %}{% load static %} {% block content %}
 <div class="container_table">
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" name="borrar_datos">Borrar datos</button>
+  </form>
   <div class="row col-12">
     <div class="col-12">
       <div class="card">
@@ -53,7 +57,7 @@
               <td>{{ proyecto.Descripcion }}</td>
               <td>{{ proyecto.Fecha_Inicio }}</td>
               <td>{{ proyecto.Fecha_Finalizacion }}</td>
-              <td>{{ proyecto.Id_Empresa }}</td>
+              <td>{{ proyecto.Id_Empresa_id }}</td>
               <td>{{ proyecto.Estado }}</td>
             </tr>
             {% endfor %}
@@ -104,7 +108,7 @@
               <td>{{ factura.ID }}</td>
               <td>{{ factura.Fecha_Factura }}</td>
               <td>{{ factura.Valor }}</td>
-              <td>{{ factura.Id_M_Pago }}</td>
+              <td>{{ factura.Id_M_Pago_id }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -152,8 +156,8 @@
             {% for consultoria in consultorias %}
             <tr>
               <td>{{ consultoria.ID }}</td>
-              <td>{{ consultoria.Id_Factura }}</td>
-              <td>{{ consultoria.Id_T_Servicio }}</td>
+              <td>{{ consultoria.Id_Factura_id }}</td>
+              <td>{{ consultoria.Id_T_Servicio_id }}</td>
               <td>{{ consultoria.Estado }}</td>
             </tr>
             {% endfor %}
@@ -178,8 +182,8 @@
             {% for cons_emp in cons_emps %}
             <tr>
               <td>{{ cons_emp.ID }}</td>
-              <td>{{ cons_emp.id_Consultoria }}</td>
-              <td>{{ cons_emp.id_Empresa }}</td>
+              <td>{{ cons_emp.id_Consultoria_id }}</td>
+              <td>{{ cons_emp.id_Empresa_id }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -232,8 +236,8 @@
             {% for cons_cons in cons_conses %}
             <tr>
               <td>{{ cons_cons.ID }}</td>
-              <td>{{ cons_cons.Id_Consultoria }}</td>
-              <td>{{ cons_cons.Id_Consultor }}</td>
+              <td>{{ cons_cons.Id_Consultoria_id }}</td>
+              <td>{{ cons_cons.Id_Consultor_id }}</td>
             </tr>
             {% endfor %}
           </tbody>

@@ -1,0 +1,186 @@
+CREATE TABLE EMPRESA(
+    ID INTEGER PRIMARY KEY,
+    Nit VARCHAR(20),
+    Nombre VARCHAR(50),
+    Direccion VARCHAR(100),
+    Sector VARCHAR(50),
+    Correo VARCHAR(50)
+);
+
+CREATE TABLE PROYECTO (
+    ID INTEGER PRIMARY KEY,
+    Nombre VARCHAR(50),
+    Descripcion VARCHAR(200),
+    Fecha_Inicio DATE,
+    Fecha_Finalizacion DATE,
+    Id_Empresa INTEGER,
+    Estado BOOLEAN,
+    CONSTRAINT fk_Proyecto_Empresa FOREIGN KEY(Id_Empresa) REFERENCES EMPRESA (ID)
+);
+
+CREATE TABLE METODO_PAGO (
+    ID INTEGER PRIMARY KEY,
+    Nombre VARCHAR(50),
+    Descripcion VARCHAR(100),
+    Estado BOOLEAN
+);
+
+CREATE TABLE FACTURA (
+    ID INTEGER PRIMARY KEY,
+    Fecha_Factura DATE,
+    Valor FLOAT,
+    Id_M_Pago INTEGER,
+    CONSTRAINT fk_Factura_M_Pago FOREIGN KEY (Id_M_Pago) REFERENCES METODO_PAGO (ID)
+);
+
+CREATE TABLE TIPO_SERVICIO (
+    ID INTEGER PRIMARY KEY,
+    Nombre VARCHAR(50),
+    Descripcion VARCHAR(100),
+    Estado BOOLEAN
+);
+
+CREATE TABLE CONSULTORIA (
+    ID INTEGER PRIMARY KEY,
+    Id_Factura INTEGER,
+    Id_T_Servicio INTEGER,
+    Estado BOOLEAN,
+    CONSTRAINT fk_Consultoria_Factura FOREIGN KEY (Id_Factura) REFERENCES FACTURA (ID),
+    CONSTRAINT fk_Consultoria_T_Servicio FOREIGN KEY (Id_T_Servicio) REFERENCES TIPO_SERVICIO(ID)
+);
+
+CREATE TABLE CONS_EMP (
+    ID INTEGER PRIMARY KEY,
+    id_Consultoria INTEGER,
+    id_Empresa INTEGER,
+    CONSTRAINT fk_Cons_Emp_Consultoria FOREIGN KEY (Id_Consultoria) REFERENCES CONSULTORIA (ID),
+    CONSTRAINT fk_Cons_Emp_Empresa FOREIGN KEY (Id_Empresa) REFERENCES EMPRESA (ID)
+);
+
+CREATE TABLE CONSULTOR (
+    ID INTEGER PRIMARY KEY,
+    Nombre VARCHAR(100),
+    Telefono VARCHAR(10),
+    Correo VARCHAR(50),
+    Area_Especializacion VARCHAR(50),
+    ESTADO BOOLEAN
+);
+
+CREATE TABLE CONS_CONS (
+    ID INTEGER PRIMARY KEY,
+    Id_Consultoria INTEGER,
+    Id_Consultor INTEGER,
+    CONSTRAINT fk_Cons_Cons_Consultoria FOREIGN KEY (Id_Consultoria) REFERENCES CONSULTORIA (ID),
+    CONSTRAINT fk_Cons_Cons_Consultor FOREIGN KEY (Id_Consultor) REFERENCES CONSULTOR (ID)
+);
+
+#-----------------------PROCEDURE------------------------
+
+#EMPRESA
+DELIMITER //
+CREATE PROCEDURE AgregarEmpresa()
+BEGIN
+    INSERT INTO EMPRESA (ID, Nit, Nombre, Direccion,Sector, Correo)
+    SELECT ID_Empresa, Nit_Empresa,Nombre_Empresa,Direccion_Empresa,Sector_Empresa,Correo_Empresa
+    FROM TablaTemporal;
+END //
+
+#PROYECTO
+DELIMITER //
+CREATE PROCEDURE AgregarProyecto()
+BEGIN
+    INSERT INTO PROYECTO (ID, Nombre, Descripcion, Fecha_Inicio, Fecha_Finalizacion, Id_Empresa_id, Estado)
+    SELECT ID_Proyecto, Nombre_Proyecto, Descripcion_Proyecto, Fecha_Inicio_Proyecto, Fecha_Finalizacion_Proyecto, Id_Empresa_Proyecto, Estado_Proyecto
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+#METODO_PAGO
+DELIMITER //
+CREATE PROCEDURE AgregarMetodoPago()
+BEGIN
+    INSERT INTO METODO_PAGO (ID, Nombre, Descripcion, Estado)
+    SELECT ID_M_Pago, Nombre_M_Pago, Descripcion_M_Pago, Estado_M_Pago
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+#FACTURA
+DELIMITER //
+CREATE PROCEDURE AgregarFactura()
+BEGIN
+    INSERT INTO FACTURA (ID, Fecha_Factura, Valor, Id_M_Pago_id)
+    SELECT ID_Factura, Fecha_Factura, Valor_Factura, Id_M_Pago_Factura
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+#TIPO_SERVICIO
+DELIMITER //
+CREATE PROCEDURE AgregarTipoServicio()
+BEGIN
+    INSERT INTO TIPO_SERVICIO (ID, Nombre, Descripcion, Estado)
+    SELECT ID_T_Servicio, Nombre_T_Servicio, Descripcion_T_Servicio, Estado_T_Servicio
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+#CONSULTORIA
+DELIMITER //
+CREATE PROCEDURE AgregarConsultoria()
+BEGIN
+    INSERT INTO CONSULTORIA (ID, Id_Factura_id, Id_T_Servicio_id, Estado)
+    SELECT ID_Consultoria, Id_Factura_Consultoria, Id_T_Servicio_Consultoria, Estado_Consultoria
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+#CONS_EMP
+DELIMITER //
+CREATE PROCEDURE AgregarConsEmp()
+BEGIN
+    INSERT INTO CONS_EMP (ID, id_Consultoria_id, id_Empresa_id)
+    SELECT ID_CONS_EMP, id_Consultoria_CONS_EMP, id_Empresa_CONS_EMP
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+#CONSULTOR
+DELIMITER //
+CREATE PROCEDURE AgregarConsultor()
+BEGIN
+    INSERT INTO CONSULTOR (ID, Nombre, Telefono, Correo, Area_Especializacion, ESTADO)
+    SELECT ID_Consultor, Nombre_Consultor, Telefono_Consultor, Correo_Consultor, Area_Especializacion_Consultor, ESTADO_Consultor
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+#CONSULTORIA-CONSULTOR
+DELIMITER //
+CREATE PROCEDURE AgregarConsCons()
+BEGIN
+    INSERT INTO CONS_CONS (ID, Id_Consultoria_id, Id_Consultor_id)
+    SELECT ID_CONS_CONS, Id_Consultoria_CONS_CONS, Id_Consultor_CONS_CONS
+    FROM TablaTemporal;
+END //
+DELIMITER ;
+
+# BORRAR TODOS LOS REGISTROS DE LAS TABLAS
+DELIMITER //
+CREATE PROCEDURE BorrarDatosTablas()
+BEGIN
+    -- Desactivar verificación de claves foráneas temporalmente
+    SET FOREIGN_KEY_CHECKS = 0;
+    DELETE FROM CONS_CONS;
+    DELETE FROM CONSULTOR;
+    DELETE FROM CONS_EMP;
+    DELETE FROM CONSULTORIA;
+    DELETE FROM TIPO_SERVICIO;
+    DELETE FROM FACTURA;
+    DELETE FROM METODO_PAGO;
+    DELETE FROM PROYECTO;
+    DELETE FROM EMPRESA;
+    SET FOREIGN_KEY_CHECKS = 1;
+END //
+DELIMITER ;
+
