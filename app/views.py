@@ -109,6 +109,7 @@ class TableView(TemplateView):
         context['cons_emps'] = ConsEmp.objects.all()
         context['consultores'] = Consultor.objects.all()
         context['cons_conses'] = ConsCons.objects.all()
+        context['ganancias'] = Ganancia.objects.all()
         return context
     
     def post(self, request, *args, **kwargs):

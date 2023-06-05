@@ -2,7 +2,9 @@
 <div class="container_table">
   <form method="POST">
     {% csrf_token %}
-    <button  class="button" type="submit" name="borrar_datos">Borrar datos</button>
+    <button class="button" type="submit" name="borrar_datos">
+      Borrar datos
+    </button>
   </form>
   <div class="row col-12">
     <div class="col-12">
@@ -99,6 +101,7 @@
               <th>Id</th>
               <th>Fecha de Factura</th>
               <th>Valor</th>
+              <th>Aumento</th>
               <th>Id Método de Pago</th>
             </tr>
           </thead>
@@ -108,6 +111,7 @@
               <td>{{ factura.ID }}</td>
               <td>{{ factura.Fecha_Factura }}</td>
               <td>{{ factura.Valor }}</td>
+              <td>{{ factura.aumento }}</td>
               <td>{{ factura.Id_M_Pago_id }}</td>
             </tr>
             {% endfor %}
@@ -149,6 +153,7 @@
               <th>Id</th>
               <th>Id Factura</th>
               <th>Id Tipo de Servicio</th>
+              <th>Creado</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -158,6 +163,7 @@
               <td>{{ consultoria.ID }}</td>
               <td>{{ consultoria.Id_Factura_id }}</td>
               <td>{{ consultoria.Id_T_Servicio_id }}</td>
+              <td>{{ consultoria.creado_en}}</td>
               <td>{{ consultoria.Estado }}</td>
             </tr>
             {% endfor %}
@@ -238,6 +244,33 @@
               <td>{{ cons_cons.ID }}</td>
               <td>{{ cons_cons.Id_Consultoria_id }}</td>
               <td>{{ cons_cons.Id_Consultor_id }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header">
+          <h4>Relación Consultoría-Consultor</h4>
+        </div>
+        <table class="table table-striped-columns table-custom">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Total</th>
+              <th>Descuentos</th>
+              <th>Id_Factura</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ganancia in ganancias %}
+            <tr>
+              <td>{{ ganancia.ID }}</td>
+              <td>{{ ganancia.Total }}</td>
+              <td>{{ ganancia.Descuentos }}</td>
+              <td>{{ ganancia.id_Factura_id }}</td>
             </tr>
             {% endfor %}
           </tbody>

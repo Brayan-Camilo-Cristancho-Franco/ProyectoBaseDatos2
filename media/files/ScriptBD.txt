@@ -1,81 +1,3 @@
-CREATE TABLE EMPRESA(
-    ID INTEGER PRIMARY KEY,
-    Nit VARCHAR(20),
-    Nombre VARCHAR(50),
-    Direccion VARCHAR(100),
-    Sector VARCHAR(50),
-    Correo VARCHAR(50)
-);
-
-CREATE TABLE PROYECTO (
-    ID INTEGER PRIMARY KEY,
-    Nombre VARCHAR(50),
-    Descripcion VARCHAR(200),
-    Fecha_Inicio DATE,
-    Fecha_Finalizacion DATE,
-    Id_Empresa INTEGER,
-    Estado BOOLEAN,
-    CONSTRAINT fk_Proyecto_Empresa FOREIGN KEY(Id_Empresa) REFERENCES EMPRESA (ID)
-);
-
-CREATE TABLE METODO_PAGO (
-    ID INTEGER PRIMARY KEY,
-    Nombre VARCHAR(50),
-    Descripcion VARCHAR(100),
-    Estado BOOLEAN
-);
-
-CREATE TABLE FACTURA (
-    ID INTEGER PRIMARY KEY,
-    Fecha_Factura DATE,
-    Valor FLOAT,
-    Id_M_Pago INTEGER,
-    CONSTRAINT fk_Factura_M_Pago FOREIGN KEY (Id_M_Pago) REFERENCES METODO_PAGO (ID)
-);
-
-CREATE TABLE TIPO_SERVICIO (
-    ID INTEGER PRIMARY KEY,
-    Nombre VARCHAR(50),
-    Descripcion VARCHAR(100),
-    Estado BOOLEAN
-);
-
-CREATE TABLE CONSULTORIA (
-    ID INTEGER PRIMARY KEY,
-    Id_Factura INTEGER,
-    Id_T_Servicio INTEGER,
-    Estado BOOLEAN,
-    CONSTRAINT fk_Consultoria_Factura FOREIGN KEY (Id_Factura) REFERENCES FACTURA (ID),
-    CONSTRAINT fk_Consultoria_T_Servicio FOREIGN KEY (Id_T_Servicio) REFERENCES TIPO_SERVICIO(ID)
-);
-
-CREATE TABLE CONS_EMP (
-    ID INTEGER PRIMARY KEY,
-    id_Consultoria INTEGER,
-    id_Empresa INTEGER,
-    CONSTRAINT fk_Cons_Emp_Consultoria FOREIGN KEY (Id_Consultoria) REFERENCES CONSULTORIA (ID),
-    CONSTRAINT fk_Cons_Emp_Empresa FOREIGN KEY (Id_Empresa) REFERENCES EMPRESA (ID)
-);
-
-CREATE TABLE CONSULTOR (
-    ID INTEGER PRIMARY KEY,
-    Nombre VARCHAR(100),
-    Telefono VARCHAR(10),
-    Correo VARCHAR(50),
-    Area_Especializacion VARCHAR(50),
-    ESTADO BOOLEAN
-);
-
-CREATE TABLE CONS_CONS (
-    ID INTEGER PRIMARY KEY,
-    Id_Consultoria INTEGER,
-    Id_Consultor INTEGER,
-    CONSTRAINT fk_Cons_Cons_Consultoria FOREIGN KEY (Id_Consultoria) REFERENCES CONSULTORIA (ID),
-    CONSTRAINT fk_Cons_Cons_Consultor FOREIGN KEY (Id_Consultor) REFERENCES CONSULTOR (ID)
-);
-
------------------------------------------ PROCEDIMIENTOS ALMACENADOS -----------------------------------------
-
 #EMPRESA
 DELIMITER //
 CREATE PROCEDURE AgregarEmpresa()
@@ -180,6 +102,7 @@ BEGIN
     DELETE FROM METODO_PAGO;
     DELETE FROM PROYECTO;
     DELETE FROM EMPRESA;
+    DELETE FROM GANANCIA;
     SET FOREIGN_KEY_CHECKS = 1;
 END //
 DELIMITER ;
@@ -213,12 +136,14 @@ BEGIN
 
         SET total = factura_valor - descuento;
 
-        INSERT INTO GANANCIA (ID,Total, Descuentos, id_Factura_id) VALUES (UUID(),total, descuento, factura_id);
+        SET @uuid = UUID();
+        INSERT INTO GANANCIA (ID, Total, Descuentos, id_Factura_id) VALUES (@uuid, total, descuento, factura_id);
     END LOOP;
 
     CLOSE cur;
 END //
 DELIMITER ;
+
 
 # Ejecución de todos los procedimientos almacenados
 DELIMITER //
@@ -237,8 +162,8 @@ BEGIN
 
 END //
 DELIMITER ;
-
------------------------------------------ TRIGGERS -----------------------------------------
+drop procedure CalcularGanancias;
+#----------------------------------------- TRIGGERS -----------------------------------------
 
 DELIMITER //
 CREATE TRIGGER trigger_empresa BEFORE INSERT ON EMPRESA
@@ -259,27 +184,61 @@ BEGIN
 END //
 DELIMITER ;
 
-drop TRIGGER trigger_proyecto
+#drop TRIGGER trigger_proyecto;
 
 DELIMITER //
 CREATE TRIGGER trigger_consultoria BEFORE INSERT ON CONSULTORIA
 FOR EACH ROW
 BEGIN
-    SET NEW.creado_en = NOW();
+    IF NEW.creado_en IS NULL THEN
+        SET NEW.creado_en = NOW();
+    END IF;
 END //
 DELIMITER ;
 
 DELIMITER //
-
 CREATE TRIGGER trigger_factura BEFORE INSERT ON FACTURA
 FOR EACH ROW
 BEGIN
-    SET NEW.Valor = CalcularValorConAumento(NEW.Valor, 0.6);
+    IF NEW.aumento IS NULL THEN
+        SET NEW.aumento = 0.6;
+    END IF;
+    SET NEW.Valor = CalcularValorConAumento(NEW.Valor, NEW.aumento);
 END //
 DELIMITER ;
 
-drop trigger trigger_factura
------------------------------------------ FUNCIONES -----------------------------------------
+DELIMITER //
+CREATE TRIGGER trigger_consultor BEFORE INSERT ON CONSULTOR
+FOR EACH ROW
+BEGIN
+    IF NEW.creado_en IS NULL THEN
+        SET NEW.creado_en = NOW();
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trigger_consultores BEFORE INSERT ON CONS_EMP
+FOR EACH ROW
+BEGIN
+    IF NEW.creado_en IS NULL THEN
+        SET NEW.creado_en = NOW();
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trigger_consultoria_consultor BEFORE INSERT ON CONS_CONS
+FOR EACH ROW
+BEGIN
+    IF NEW.creado_en IS NULL THEN
+        SET NEW.creado_en = NOW();
+    END IF;
+END //
+DELIMITER ;
+
+#drop trigger trigger_consultoria_empresa;
+#----------------------------------------- FUNCIONES -----------------------------------------
 
 DELIMITER //
 CREATE FUNCTION CalcularValorConAumento(valor_in FLOAT, aumento_in FLOAT) RETURNS FLOAT

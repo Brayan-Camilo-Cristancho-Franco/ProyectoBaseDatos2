@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'etl_Base_Datos_2.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'PROYECTOBASEDATOS2',
+        'NAME': 'PROYECTOBASEDATOS3',
         'USER': 'root',
         'PASSWORD': 'TDHHpnv5IJnRHus',
         'HOST': '127.0.0.1',

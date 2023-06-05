@@ -1,5 +1,4 @@
 from django.db import models
-
 # Create your models here.
 from django.db import models
 from django.utils import timezone
@@ -73,8 +72,8 @@ class ConsEmp(models.Model):
     ID = models.AutoField(primary_key=True)
     id_Consultoria = models.ForeignKey(Consultoria, on_delete=models.CASCADE)
     id_Empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    creado_en = models.DateTimeField(default=timezone.now)
-    modificado_en = models.DateTimeField(auto_now=True)
+    creado_en = models.DateTimeField(auto_now=True)
+    modificado_en = models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'CONS_EMP'
@@ -87,7 +86,7 @@ class Consultor(models.Model):
     Area_Especializacion = models.CharField(max_length=50)
     ESTADO = models.BooleanField()
     creado_en = models.DateTimeField(default=timezone.now)
-    modificado_en = models.DateTimeField(auto_now=True)
+    modificado_en = models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'CONSULTOR'
@@ -97,13 +96,13 @@ class ConsCons(models.Model):
     Id_Consultoria = models.ForeignKey(Consultoria, on_delete=models.CASCADE)
     Id_Consultor = models.ForeignKey(Consultor, on_delete=models.CASCADE)
     creado_en = models.DateTimeField(default=timezone.now)
-    modificado_en = models.DateTimeField(auto_now=True)
+    modificado_en = models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'CONS_CONS'
 
 class Ganancia(models.Model):
-    ID = models.AutoField(primary_key=True)
+    ID = models.CharField(primary_key=True, max_length=36)
     Total = models.FloatField()
     Descuentos = models.FloatField()
     id_Factura = models.OneToOneField(Factura, on_delete=models.CASCADE, related_name='ganancias')
