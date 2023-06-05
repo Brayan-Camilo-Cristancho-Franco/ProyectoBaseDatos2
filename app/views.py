@@ -81,15 +81,7 @@ class CSVImporterView(FormView):
                     cursor.execute(insert_query, tuple(row))
 
                 # Llamar al procedimiento almacenado "AgregarEmpresa" en la base de datos
-                cursor.callproc('AgregarEmpresa')
-                cursor.callproc('AgregarProyecto')
-                cursor.callproc('AgregarMetodoPago')
-                cursor.callproc('AgregarFactura')
-                cursor.callproc('AgregarTipoServicio')
-                cursor.callproc('AgregarConsultoria')
-                cursor.callproc('AgregarConsEmp')
-                cursor.callproc('AgregarConsultor')
-                cursor.callproc('AgregarConsCons')
+                cursor.callproc('AgregarDatos')
 
                 # Comprobar si se creó la tabla temporal y mostrar los registros
                 cursor.execute(f"SELECT * FROM {nombre_tabla_temporal}")
