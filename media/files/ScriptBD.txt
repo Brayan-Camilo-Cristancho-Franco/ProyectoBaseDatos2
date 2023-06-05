@@ -74,7 +74,7 @@ CREATE TABLE CONS_CONS (
     CONSTRAINT fk_Cons_Cons_Consultor FOREIGN KEY (Id_Consultor) REFERENCES CONSULTOR (ID)
 );
 
-#-----------------------PROCEDURE------------------------
+----------------------------------------- PROCEDIMIENTOS ALMACENADOS -----------------------------------------
 
 #EMPRESA
 DELIMITER //
@@ -184,3 +184,109 @@ BEGIN
 END //
 DELIMITER ;
 
+CREATE INDEX idx_nombre_empresa ON GANANCIA(ID);
+
+DELIMITER //
+CREATE PROCEDURE CalcularGanancias()
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE factura_id INT;
+    DECLARE factura_valor FLOAT;
+    DECLARE descuento FLOAT;
+    DECLARE total FLOAT;
+    DECLARE cur CURSOR FOR SELECT ID, Valor FROM FACTURA;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    SET descuento = 0;
+    SET total = 0;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO factura_id, factura_valor;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        SET descuento = factura_valor * 0.1;
+
+        SET total = factura_valor - descuento;
+
+        INSERT INTO GANANCIA (ID,Total, Descuentos, id_Factura_id) VALUES (UUID(),total, descuento, factura_id);
+    END LOOP;
+
+    CLOSE cur;
+END //
+DELIMITER ;
+
+# Ejecución de todos los procedimientos almacenados
+DELIMITER //
+CREATE PROCEDURE AgregarDatos()
+BEGIN
+    CALL AgregarEmpresa();
+    CALL AgregarProyecto();
+    CALL AgregarMetodoPago();
+    CALL AgregarFactura();
+    CALL AgregarTipoServicio();
+    CALL AgregarConsultoria();
+    CALL AgregarConsEmp();
+    CALL AgregarConsultor();
+    CALL AgregarConsCons();
+    CALL CalcularGanancias();
+
+END //
+DELIMITER ;
+
+----------------------------------------- TRIGGERS -----------------------------------------
+
+DELIMITER //
+CREATE TRIGGER trigger_empresa BEFORE INSERT ON EMPRESA
+FOR EACH ROW
+BEGIN
+    SET NEW.creado_en = NOW();
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trigger_proyecto BEFORE INSERT ON PROYECTO
+FOR EACH ROW
+BEGIN
+    SET NEW.creado_en = NOW();
+    IF NEW.Fecha_Inicio > NEW.Fecha_Finalizacion THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La fecha de inicio debe ser menor a la fecha de finalización del proyecto';
+    END IF;
+END //
+DELIMITER ;
+
+drop TRIGGER trigger_proyecto
+
+DELIMITER //
+CREATE TRIGGER trigger_consultoria BEFORE INSERT ON CONSULTORIA
+FOR EACH ROW
+BEGIN
+    SET NEW.creado_en = NOW();
+END //
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trigger_factura BEFORE INSERT ON FACTURA
+FOR EACH ROW
+BEGIN
+    SET NEW.Valor = CalcularValorConAumento(NEW.Valor, 0.6);
+END //
+DELIMITER ;
+
+drop trigger trigger_factura
+----------------------------------------- FUNCIONES -----------------------------------------
+
+DELIMITER //
+CREATE FUNCTION CalcularValorConAumento(valor_in FLOAT, aumento_in FLOAT) RETURNS FLOAT
+DETERMINISTIC
+BEGIN
+    DECLARE valor_con_aumento FLOAT;
+    SET valor_con_aumento = valor_in + (valor_in * aumento_in);
+    RETURN valor_con_aumento;
+END;
+DELIMITER ;

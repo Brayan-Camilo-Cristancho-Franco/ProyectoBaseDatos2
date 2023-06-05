@@ -42,7 +42,7 @@ class MetodoPago(models.Model):
 class Factura(models.Model):
     ID = models.AutoField(primary_key=True)
     Fecha_Factura = models.DateField()
-    Valor = models.FloatField()
+    Valor = models.FloatField(null=True)
     aumento = models.FloatField(default=0.6)
     Id_M_Pago = models.ForeignKey(MetodoPago, on_delete=models.CASCADE)
 
